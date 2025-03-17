@@ -4,11 +4,11 @@ class Joueur():
     liste_strategie = ['confiance', 'tricheur']
     def __init__(self, portefeuille, identifiant):
         self.identifiant = identifiant
-        self.portefeuille = portefeuille 
+        self.portefeuille = portefeuille
         self.strategie = self.strategie(self.liste_strategie)
 
-    def solde(self, portefeuille, resultat):
-        return portefeuille + resultat
+    def solde(self, resultat):
+        self.portefeuille += resultat
 
     def strategie(self, liste_strategie):
         strategie = liste_strategie[int((random()*100)%(len(self.liste_strategie)))]
@@ -42,7 +42,8 @@ class Strategie():
 
 new_game = Partie(10)
 for (key, value) in new_game.liste_joueurs.items() :
-    print(key, value.strategie)
+    if key == 'joueur5' :
+        value.solde(-20)
+    print(key, value.portefeuille)
 print("\n")
-for (key, value) in new_game.liste_joueurs.items() :
-    print(key, value.strategie)
+

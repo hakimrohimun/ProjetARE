@@ -1,0 +1,76 @@
+Pour contribuer à un projet commun sur GitHub, tu dois suivre quelques étapes pour pouvoir pousser (push) tes modifications et collaborer efficacement. Voici un guide détaillé pour t'aider à commencer :
+1. Cloner le projet
+
+Si tu n'as pas encore une copie locale du projet, commence par le cloner sur ton ordinateur.
+
+Commande :
+
+git clone https://github.com/username/nom-du-projet.git
+
+Remplace username par le nom d'utilisateur du propriétaire du projet et nom-du-projet par le nom du projet.
+2. Créer une branche pour travailler
+
+Avant de commencer à modifier quoi que ce soit, il est recommandé de créer une nouvelle branche pour éviter de modifier directement la branche principale (souvent main ou master).
+
+Commande :
+
+git checkout -b nom-de-ta-branche
+
+Remplace nom-de-ta-branche par un nom descriptif pour ta branche.
+3. Faire tes modifications
+
+Modifie les fichiers du projet comme tu le souhaites avec ton éditeur de texte préféré.
+4. Vérifier l'état des fichiers modifiés
+
+Après avoir effectué des changements, vérifie quels fichiers ont été modifiés en utilisant la commande suivante :
+
+Commande :
+
+git status
+
+Cela te montrera les fichiers modifiés ou ajoutés.
+5. Ajouter les fichiers modifiés à l'index Git
+
+Une fois que tu es satisfait de tes modifications, ajoute-les à l'index Git pour pouvoir les valider.
+
+Commande :
+
+git add .
+
+Cela ajoutera tous les fichiers modifiés. Si tu veux ajouter un fichier spécifique, tu peux spécifier son nom au lieu de ..
+6. Faire un commit
+
+Maintenant, fais un commit avec un message décrivant les changements que tu as effectués.
+
+Commande :
+
+git commit -m "Ton message de commit ici"
+
+Assure-toi que ton message de commit soit clair et explicite sur ce que tu as modifié.
+7. Pousser tes modifications sur GitHub
+
+Une fois que tu as effectué le commit, pousse ta branche sur GitHub.
+
+Commande :
+
+git push origin nom-de-ta-branche
+
+Remplace nom-de-ta-branche par le nom de ta branche.
+8. Faire une Pull Request (PR)
+
+Une fois que tu as poussé ta branche sur GitHub, il te faut créer une pull request (PR) pour proposer tes modifications à la branche principale du projet.
+
+    Va sur la page du projet sur GitHub.
+    Clique sur l'onglet Pull requests.
+    Clique sur New Pull Request.
+    Sélectionne ta branche et clique sur Create Pull Request.
+    Ajoute une description détaillant les modifications et clique sur Create Pull Request.
+
+9. Collaborer et apporter des modifications supplémentaires
+
+Si le propriétaire du projet ou un autre collaborateur demande des modifications ou si tu veux continuer à travailler sur ta branche, tu peux répéter les étapes 4 à 7.
+10. Fusionner la Pull Request (PR)
+
+Si tout est approuvé, ta PR pourra être fusionnée dans la branche principale du projet par un mainteneur du projet.
+
+Voilà les étapes de base pour collaborer sur un projet commun sur GitHub ! Si tu rencontres un problème à n'importe quelle étape, n'hésite pas à me demander.

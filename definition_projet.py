@@ -1,16 +1,12 @@
 import random
 
-taille = 10
-mise = 1
-gain_sans_triche = 2
-gain_une_triche = 3
-gain_deux_triche = 0
-
+#MODELS
 
 class Joueur:
     #Initialisation de l'entité Joueur défini par une quantité d'argent, un identifiant, une stratégie et un historique de jeu.
     def __init__(self, portefeuille, identifiant, strategie):
         self.identifiant = 'Joueur' + str(identifiant) #Initialisation de l'id type : 'Joueur0'
+        self.portefeuille_init = portefeuille
         self.portefeuille = portefeuille 
         self.strategie = Strategie(strategie)
         self.historique_transaction = []
@@ -21,7 +17,9 @@ class Joueur:
     def applyStrat(self):
         if self.strategie.strategie.__name__ == "copieur" and len(self.historique_transaction):
             ancien_joueur_adv = [element for element in self.historique_transaction[-1] if element not in ["Gagnant", self.identifiant]]
-            return self.strategie.strategie(self.historique_transaction[-1][ancien_joueur_adv])
+            return self.strategie.strategie(self.historique_transaction[-1][ancien_joueur_adv[0]])
+        elif self.strategie.strategie.__name__ == "trader" :
+            return self.strategie.strategie(self.portefeuille_init, self.portefeuille)
         else :
             return self.strategie.strategie()
     
@@ -36,6 +34,7 @@ class Partie:
         self.portefeuille_depart = portefeuille_depart #Initie la valeur des portefeuille de chaque joueurs au départ
         self.liste_strategies = self.proportionStrategies(liste_proportion_strategie) #Definie une liste avec 100 element qui represente la répartition des strategies à partir d'une liste d'entre formaté. On l'appellera pour assigné une stratégie à un joueur.
         self.liste_joueurs = self.initJoueurs(self.nombre_joueurs, self.portefeuille_depart) #Initie tous les joueurs avec un portefeuille de départ et une strategie basée sur la proportion de strategie de départ.
+        self.liste_transaction = []
 
     #Definie une liste de 100 element dont la réccurence de chaque element est equivalent à la proportion d'appartition de la stratégie dans la population. Cette liste est crée à partir d'une liste formaté type : [('strategie', (int)proportion)] 
     def proportionStrategies(self, liste_proportion_strategie):
@@ -49,11 +48,11 @@ class Partie:
         return liste_strategies
 
     def initJoueurs(self, nombre_joueurs, portefeuille_depart):
-        liste_joueurs = {} #Dictionnaire de recensement de tous les Joueurs de la partie avec un identifiant en key et leur objet en Value  
+        liste_joueurs = [] #Dictionnaire de recensement de tous les Joueurs de la partie avec un identifiant en key et leur objet en Value  
         for index_joueur in range(nombre_joueurs):
             indice_strategie = int((random.random()*100)%(len(self.liste_strategies)))
             nouveau_joueur = Joueur(portefeuille_depart, index_joueur, self.liste_strategies[indice_strategie])
-            liste_joueurs[nouveau_joueur.identifiant] = nouveau_joueur
+            liste_joueurs.append(nouveau_joueur)
         return liste_joueurs
 
     def __str__(self):
@@ -77,10 +76,10 @@ class Echange:
         mise_joueur2 = joueur2.applyStrat()
         if mise_joueur1:
             if mise_joueur2:
-                joueur1.solde(gain_sans_triche) #Adapte le solde des participant à actuel+gain si les deux ont mis
-                joueur2.solde(gain_sans_triche)
-                transaction[joueur1.identifiant] = {'mise' : mise_joueur1, 'Gains' : gain_sans_triche}
-                transaction[joueur2.identifiant] = {'mise' : mise_joueur2, 'Gains' : gain_sans_triche}
+                joueur1.solde(gain_sans_triche-mise) #Adapte le solde des participant à actuel+gain si les deux ont mis
+                joueur2.solde(gain_sans_triche-mise)
+                transaction[joueur1.identifiant] = {'mise' : mise_joueur1, 'Gains' : gain_sans_triche-mise}
+                transaction[joueur2.identifiant] = {'mise' : mise_joueur2, 'Gains' : gain_sans_triche-mise}
                 transaction["Gagnant"] = "Cooperation"
             else : 
                 joueur1.solde(-mise) #Adapte le solde des participant à actuel+gain si le Joueur2 n'a pas mis
@@ -126,19 +125,61 @@ class Strategie:
         if reponse is None or reponse:  # Première fois ou copie d'un coup favorable
             return True
         return False
+    
+    def trader(self, portefeuille_init, portefeuille):
+        """ foncton de stratégie de jeu ,prend une liste de joeurs en entrée : plus le joueur perd de son portefeuille, 
+        moins il joue"""
+        facteur_risque = (portefeuille_init - portefeuille) / portefeuille_init
+        proba_de_jouer = 1 - facteur_risque
+        if random.random() < proba_de_jouer:
+            return True
+        else:
+            return False
 
 
+#MAIN
 
-new_game = Partie(10, 990, [('gentil', 0.2), ('mechant', 0.2), ('aleatoire', 0.1), ('copieur', 0.01)])
+#Parametre initiaux définis par l'utilisateur ?
 
-Joueur1 = new_game.liste_joueurs['Joueur0']
-Joueur2 = new_game.liste_joueurs['Joueur1']
+#nombre de joueurs
+nb_joueurs = 50
+#Nombre de Tours
+nb_tour = 150
+#definition du portefeuille de départ. Voire si il est le meme pour tous ou variable en fonctrion de certain critère à définir
+portefeuille_init = 1000
+#nb pièces pour la mise c a d True
+mise = 1
+#différent gain en fonction des mises. Les gains sont indiqué comme le retour de pièce. c a d avec un gain sans triche de 2, l'utilisateur gagne réellement seulement 1 piece car mise = 1
+gain_sans_triche = 2
+gain_une_triche = 3
+gain_deux_triche = 0
 
-print(Joueur1)
-print(Joueur2)
+#definition d'une liste de répartition des stratégies dans la partie 
+prop_strat = [('gentil', 0.2), ('mechant', 0.2), ('aleatoire', 0.1), ('copieur', 0.01), ('trader', 0.02)]
 
-New = Echange(Joueur1, Joueur2)
+#Creation d'une partie avec un nombre de joueur, un portefeuille de départ pour la population, une liste de répartition des stratégies dans la population
+new_game = Partie(nb_joueurs, portefeuille_init, prop_strat)
 
-print(New.resume, New.joueurs)
-print(Joueur1, Joueur1.historique_transaction)
-print(Joueur2, Joueur2.historique_transaction)
+
+#DEBUT SIMULATION
+
+#recupération de la liste de joueurs
+liste_Joueurs = new_game.liste_joueurs
+
+for tour in range(nb_tour):
+    index_echange = 1
+    for nb_echanges in range(len(liste_Joueurs)-1):
+        for indice_joueur in range(len(liste_Joueurs)) :
+            joueur1 = liste_Joueurs[indice_joueur]
+            joueur2 = liste_Joueurs[(indice_joueur + index_echange) % nb_joueurs]
+            new_transation = Echange(joueur1, joueur2)
+            new_game.liste_transaction.append(new_transation.resume)
+            #print(joueur1, "\t\t", joueur2, "\n")
+            #print(f'RESUME DE LA TRANSACTION : \n {new_transation.resume}\n')
+        index_echange += 1
+
+for joueurs in liste_Joueurs:
+    print(joueurs)
+        
+
+
